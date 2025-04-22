@@ -196,4 +196,8 @@ export class DocumentService {
   canEditDocument(document: Document): boolean {
     return document.status === DocumentStatus.Draft;
   }
+
+  getDocumentViewUrl(document: Document): string {
+    return '/assets/document.pdf';
+  }
 } 
