@@ -9,7 +9,7 @@ import { DocumentTableComponent } from './document-table/document-table.componen
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
+  
   imports: [
     CommonModule,
     DashboardHeaderComponent,
@@ -26,13 +26,11 @@ export class DashboardComponent implements OnInit {
   isLoading = computed(() => this.dashboardState.isLoading());
   isProcessing = computed(() => this.documentActions.isProcessing());
   
-  constructor() {
-    effect(() => {
-      if (!this.isLoading()) {
-        this.dashboardState.updateUniqueCreators();
-      }
-    });
-  }
+  readonly updateCreatorsEffect = effect(() => {
+    if (!this.isLoading()) {
+      this.dashboardState.updateUniqueCreators();
+    }
+  });
 
   ngOnInit(): void {
     this.dashboardState.loadDocuments();

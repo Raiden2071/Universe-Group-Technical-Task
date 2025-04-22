@@ -7,7 +7,6 @@ import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard-header',
-  standalone: true,
   imports: [
     CommonModule,
     MatToolbarModule,

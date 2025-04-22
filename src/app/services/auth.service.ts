@@ -1,4 +1,4 @@
-import { Injectable, Signal, computed, signal, inject } from '@angular/core';
+import { Injectable, Signal, computed, signal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { User, UserRole } from '../models/user.model';
@@ -15,12 +15,11 @@ interface LoginResponse {
 export class AuthService {
   private currentUserSignal = signal<User | null>(null);
   
-  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   
-  constructor() {
+  readonly initEffect = effect(() => {
     this.loadUserFromStorage();
-  }
+  });
 
   get currentUser(): Signal<User | null> {
     return this.currentUserSignal.asReadonly();

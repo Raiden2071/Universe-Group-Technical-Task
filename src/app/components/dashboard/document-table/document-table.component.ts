@@ -17,7 +17,6 @@ import { DocumentActionsComponent } from '../document-actions/document-actions.c
 
 @Component({
   selector: 'app-document-table',
-  standalone: true,
   imports: [
     CommonModule,
     MatCardModule,

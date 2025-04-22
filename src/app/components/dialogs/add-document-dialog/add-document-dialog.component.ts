@@ -9,7 +9,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-document-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -26,15 +25,12 @@ export class AddDocumentDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<AddDocumentDialogComponent>);
   
-  form: FormGroup;
+  form: FormGroup = this.fb.group({
+    name: ['', [Validators.required]],
+    saveAsDraft: [false]
+  });
+  
   selectedFile: File | null = null;
-
-  constructor() {
-    this.form = this.fb.group({
-      name: ['', [Validators.required]],
-      saveAsDraft: [false]
-    });
-  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

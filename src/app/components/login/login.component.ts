@@ -13,7 +13,6 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
@@ -35,15 +34,12 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   
-  loginForm: FormGroup;
+  loginForm: FormGroup = this.formBuilder.group({
+    username: ['', [Validators.required]],
+    password: ['', [Validators.required]]
+  });
+  
   loading = false;
-
-  constructor() {
-    this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
-    });
-  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {

@@ -13,7 +13,6 @@ import { DocumentStatus } from '../../../models/document.model';
 
 @Component({
   selector: 'app-document-filters',
-  standalone: true,
   imports: [
     CommonModule,
     MatCardModule,
@@ -38,13 +37,11 @@ export class DocumentFiltersComponent {
   uniqueCreators = computed(() => this.state.uniqueCreators());
   isProcessing = computed(() => this.documentActions.isProcessing());
   
-  constructor() {
-    effect(() => {
-      if (!this.state.isLoading()) {
-        this.state.updateUniqueCreators();
-      }
-    });
-  }
+  readonly updateCreatorsEffect = effect(() => {
+    if (!this.state.isLoading()) {
+      this.state.updateUniqueCreators();
+    }
+  });
   
   onStatusFilterChange(status: DocumentStatus | ''): void {
     this.state.setStatusFilter(status);

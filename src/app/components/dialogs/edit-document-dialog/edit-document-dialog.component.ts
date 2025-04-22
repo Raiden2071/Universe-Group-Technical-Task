@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -9,7 +9,6 @@ import { Document } from '../../../models/document.model';
 
 @Component({
   selector: 'app-edit-document-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -22,15 +21,15 @@ import { Document } from '../../../models/document.model';
   styleUrls: ['./edit-document-dialog.component.scss']
 })
 export class EditDocumentDialogComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly dialogRef = inject(MatDialogRef<EditDocumentDialogComponent>);
+  readonly data = inject(MAT_DIALOG_DATA) as { document: Document };
+  
   form: FormGroup;
   
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<EditDocumentDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { document: Document }
-  ) {
+  constructor() {
     this.form = this.fb.group({
-      name: [data.document.name, [Validators.required]]
+      name: [this.data.document.name, [Validators.required]]
     });
   }
   

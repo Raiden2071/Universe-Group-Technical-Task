@@ -58,8 +58,6 @@ export class DashboardStateService {
   
   totalDocumentsCount = computed<number>(() => this.filteredDocuments().length);
   
-  constructor() { }
-  
   handlePageEvent(event: PageEvent): void {
     this.pageSize.set(event.pageSize);
     this.pageIndex.set(event.pageIndex);

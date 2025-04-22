@@ -12,7 +12,6 @@ import { Document, DocumentStatus } from '../../../models/document.model';
 
 @Component({
   selector: 'app-document-actions',
-  standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,

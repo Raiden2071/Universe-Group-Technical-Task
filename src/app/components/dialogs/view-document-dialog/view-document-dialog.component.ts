@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,6 @@ import { PdfViewerComponent } from '../../../pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-view-document-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     MatDialogModule,
@@ -23,11 +22,8 @@ import { PdfViewerComponent } from '../../../pdf-viewer/pdf-viewer.component';
 })
 export class ViewDocumentDialogComponent implements OnInit {
   loading = false;
-
-  constructor(
-    private dialogRef: MatDialogRef<ViewDocumentDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { document: Document }
-  ) {}
+  private readonly dialogRef = inject(MatDialogRef<ViewDocumentDialogComponent>);
+  readonly data = inject(MAT_DIALOG_DATA) as { document: Document };
 
   ngOnInit(): void {}
 
