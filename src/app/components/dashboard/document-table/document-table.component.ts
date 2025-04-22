@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -39,7 +39,6 @@ export class DocumentTableComponent {
   readonly state = inject(DashboardStateService);
   readonly actions = inject(DocumentActionsService);
   
-  // Состояние таблицы через сигналы
   isLoading = computed(() => this.state.isLoading());
   isProcessingAction = computed(() => this.actions.isProcessing());
   actionError = computed(() => this.actions.actionError());

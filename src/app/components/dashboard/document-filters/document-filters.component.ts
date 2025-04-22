@@ -1,4 +1,4 @@
-import { Component, inject, computed, effect } from '@angular/core';
+import { Component, inject, computed, effect, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,7 +32,6 @@ export class DocumentFiltersComponent {
   private readonly documentActions = inject(DocumentActionsService);
   readonly state = inject(DashboardStateService);
   
-  // Вычисляемые сигналы
   isReviewer = computed(() => this.authService.isReviewer());
   statusFilter = computed(() => this.state.statusFilter());
   creatorFilter = computed(() => this.state.creatorFilter());

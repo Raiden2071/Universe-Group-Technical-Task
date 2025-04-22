@@ -1,4 +1,5 @@
-import { Component, Input, inject, computed, signal } from '@angular/core';
+import { Component, Input, inject, computed, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,6 +38,7 @@ export class DocumentActionsComponent {
   private readonly authService = inject(AuthService);
   private readonly documentActions = inject(DocumentActionsService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
   
   isReviewer = computed(() => this.authService.isReviewer());
   
@@ -55,14 +57,16 @@ export class DocumentActionsComponent {
   }
   
   updateStatus(newStatus: DocumentStatus): void {
-    this.documentActions.updateStatus(this.documentSignal(), newStatus).subscribe({
-      next: () => {
-        this.snackBar.open(`Document status updated to ${newStatus}`, 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        this.snackBar.open(`Error updating status: ${err.message}`, 'Close', { duration: 5000 });
-      }
-    });
+    this.documentActions.updateStatus(this.documentSignal(), newStatus)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(`Document status updated to ${newStatus}`, 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          this.snackBar.open(`Error updating status: ${err.message}`, 'Close', { duration: 5000 });
+        }
+      });
   }
   
   recallDocument(): void {

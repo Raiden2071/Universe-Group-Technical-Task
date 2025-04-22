@@ -1,10 +1,10 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 
 import { DocumentService } from './document.service';
-import { AuthService } from './auth.service';
 import { Document, DocumentStatus } from '../models/document.model';
 
 import { AddDocumentDialogComponent } from '../components/dialogs/add-document-dialog/add-document-dialog.component';
@@ -19,6 +19,7 @@ export class DocumentActionsService {
   private readonly documentService = inject(DocumentService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef, { optional: true });
   
   private processingAction = signal<boolean>(false);
   private lastActionError = signal<string | null>(null);
@@ -29,22 +30,30 @@ export class DocumentActionsService {
   addDocument(): void {
     const dialogRef = this.dialog.open(AddDocumentDialogComponent);
     
-    dialogRef.afterClosed().subscribe(result => {
+    let afterClosed$ = dialogRef.afterClosed();
+    
+    if (this.destroyRef) {
+      afterClosed$ = afterClosed$.pipe(takeUntilDestroyed(this.destroyRef));
+    }
+    
+    afterClosed$.subscribe(result => {
       if (result) {
         this.processingAction.set(true);
         this.lastActionError.set(null);
         
-        this.documentService.addDocument(
+        let addDocument$ = this.documentService.addDocument(
           result.name,
           result.file,
           result.saveAsDraft ? DocumentStatus.Draft : DocumentStatus.PendingReview
         ).pipe(
-          tap({
-            finalize: () => {
-              this.processingAction.set(false);
-            }
-          })
-        ).subscribe({
+          finalize(() => this.processingAction.set(false))
+        );
+        
+        if (this.destroyRef) {
+          addDocument$ = addDocument$.pipe(takeUntilDestroyed(this.destroyRef));
+        }
+        
+        addDocument$.subscribe({
           next: () => {
             this.snackBar.open('Document added successfully', 'Close', { duration: 3000 });
           },
@@ -62,18 +71,29 @@ export class DocumentActionsService {
       data: { document }
     });
     
-    dialogRef.afterClosed().subscribe(result => {
+    let afterClosed$ = dialogRef.afterClosed();
+    
+    if (this.destroyRef) {
+      afterClosed$ = afterClosed$.pipe(takeUntilDestroyed(this.destroyRef));
+    }
+    
+    afterClosed$.subscribe(result => {
       if (result) {
         this.processingAction.set(true);
         this.lastActionError.set(null);
         
-        this.documentService.updateDocument(document.id, { name: result.name }).pipe(
-          tap({
-            finalize: () => {
-              this.processingAction.set(false);
-            }
-          })
-        ).subscribe({
+        let updateDocument$ = this.documentService.updateDocument(
+          document.id, 
+          { name: result.name }
+        ).pipe(
+          finalize(() => this.processingAction.set(false))
+        );
+        
+        if (this.destroyRef) {
+          updateDocument$ = updateDocument$.pipe(takeUntilDestroyed(this.destroyRef));
+        }
+        
+        updateDocument$.subscribe({
           next: () => {
             this.snackBar.open('Document updated successfully', 'Close', { duration: 3000 });
           },
@@ -103,11 +123,7 @@ export class DocumentActionsService {
     this.lastActionError.set(null);
     
     return this.documentService.updateDocument(document.id, { status: newStatus }).pipe(
-      tap({
-        finalize: () => {
-          this.processingAction.set(false);
-        }
-      })
+      finalize(() => this.processingAction.set(false))
     );
   }
   
@@ -119,18 +135,26 @@ export class DocumentActionsService {
       }
     });
     
-    dialogRef.afterClosed().subscribe(result => {
+    let afterClosed$ = dialogRef.afterClosed();
+    
+    if (this.destroyRef) {
+      afterClosed$ = afterClosed$.pipe(takeUntilDestroyed(this.destroyRef));
+    }
+    
+    afterClosed$.subscribe(result => {
       if (result) {
         this.processingAction.set(true);
         this.lastActionError.set(null);
         
-        this.documentService.recallDocument(document.id).pipe(
-          tap({
-            finalize: () => {
-              this.processingAction.set(false);
-            }
-          })
-        ).subscribe({
+        let recallDocument$ = this.documentService.recallDocument(document.id).pipe(
+          finalize(() => this.processingAction.set(false))
+        );
+        
+        if (this.destroyRef) {
+          recallDocument$ = recallDocument$.pipe(takeUntilDestroyed(this.destroyRef));
+        }
+        
+        recallDocument$.subscribe({
           next: () => {
             this.snackBar.open('Document recalled successfully', 'Close', { duration: 3000 });
           },
@@ -151,18 +175,26 @@ export class DocumentActionsService {
       }
     });
     
-    dialogRef.afterClosed().subscribe(result => {
+    let afterClosed$ = dialogRef.afterClosed();
+    
+    if (this.destroyRef) {
+      afterClosed$ = afterClosed$.pipe(takeUntilDestroyed(this.destroyRef));
+    }
+    
+    afterClosed$.subscribe(result => {
       if (result) {
         this.processingAction.set(true);
         this.lastActionError.set(null);
         
-        this.documentService.deleteDocument(document.id).pipe(
-          tap({
-            finalize: () => {
-              this.processingAction.set(false);
-            }
-          })
-        ).subscribe({
+        let deleteDocument$ = this.documentService.deleteDocument(document.id).pipe(
+          finalize(() => this.processingAction.set(false))
+        );
+        
+        if (this.destroyRef) {
+          deleteDocument$ = deleteDocument$.pipe(takeUntilDestroyed(this.destroyRef));
+        }
+        
+        deleteDocument$.subscribe({
           next: () => {
             this.snackBar.open('Document deleted successfully', 'Close', { duration: 3000 });
           },
