@@ -1,0 +1,22 @@
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.document-info {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 15px;
+  
+  p {
+    margin: 5px 0;
+  }
+} 

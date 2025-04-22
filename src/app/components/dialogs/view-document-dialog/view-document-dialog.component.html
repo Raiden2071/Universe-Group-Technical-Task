@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>
+  {{ data.document.name }}
+  <button mat-icon-button class="close-button" (click)="onClose()">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+
+<div mat-dialog-content class="pdf-content">
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading document...</p>
+  </div>
+  
+  <div #pdfContainer class="pdf-container" [hidden]="loading">
+    <div class="pdf-placeholder">
+      <h3>Document Viewer</h3>
+      
+      <div class="file-info-section">
+        <div class="file-info-item">
+          <mat-icon>insert_drive_file</mat-icon>
+          <strong>Filename:</strong> {{ data.document.fileName }}
+        </div>
+        <div class="file-info-item">
+          <mat-icon>label</mat-icon>
+          <strong>Status:</strong> {{ data.document.status }}
+        </div>
+        <div class="file-info-item">
+          <mat-icon>person</mat-icon>
+          <strong>Created by:</strong> {{ data.document.createdBy }}
+        </div>
+        <div class="file-info-item">
+          <mat-icon>update</mat-icon>
+          <strong>Updated:</strong> {{ data.document.updatedAt | date:'medium' }}
+        </div>
+      </div>
+      
+      <p>This is a placeholder for the PSPDFKit viewer</p>
+      <p>In a real application, the document would be rendered here</p>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="onClose()">
+    <mat-icon>close</mat-icon>
+    Close
+  </button>
+</div> 

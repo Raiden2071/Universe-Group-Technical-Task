@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Add New Document</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div class="file-input-container">
+      <input type="file" id="file" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" required>
+      <label for="file" class="file-label">
+        {{ selectedFile ? selectedFile.name : 'Choose a file' }}
+      </label>
+      <div class="file-hint" *ngIf="!selectedFile">
+        Accepted file types: PDF, Word, Excel, TXT
+      </div>
+      <div class="file-selected" *ngIf="selectedFile">
+        Selected file: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
+      </div>
+    </div>
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Document Name</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        Document name is required
+      </mat-error>
+    </mat-form-field>
+    
+    <mat-checkbox formControlName="saveAsDraft">Save as Draft</mat-checkbox>
+    <div class="checkbox-hint">
+      If unchecked, the document will be sent for review
+    </div>
+  </div>
+  
+  <div mat-dialog-actions class="actions-container">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || !selectedFile">
+      Add Document
+    </button>
+  </div>
+</form> 

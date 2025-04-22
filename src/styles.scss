@@ -1,0 +1,100 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+$primary-color: #3f51b5;
+$accent-color: #ff4081;
+$light-bg: #f8f9fa;
+$card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+$hover-bg: rgba(0, 0, 0, 0.04);
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: $light-bg;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-card {
+  box-shadow: $card-shadow !important;
+  border-radius: 8px !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  
+  &:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+button.mat-raised-button {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+table.mat-table {
+  width: 100%;
+  
+  th.mat-header-cell {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 14px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+  }
+  
+  td.mat-cell {
+    padding: 12px 8px;
+  }
+    
+  tr.mat-row {
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: $hover-bg;
+    }
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+  
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+  
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+} 

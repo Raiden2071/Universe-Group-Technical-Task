@@ -1,0 +1,217 @@
+<div class="dashboard-container">
+  <mat-toolbar color="primary">
+    <div class="title-with-icon">
+      <mat-icon>description</mat-icon>
+      <span>Document Management System</span>
+    </div>
+    <span class="toolbar-spacer"></span>
+    @if (currentUser(); as user) {
+      <span class="user-info">
+        <mat-icon>person</mat-icon>
+        {{ user.username }} ({{ user.role }})
+      </span>
+    }
+    <button mat-icon-button (click)="logout()" title="Logout">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div class="content-container">
+    <div class="filters-container">
+      <mat-card>
+        <mat-card-content>
+          <div class="filter-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Filter by Status</mat-label>
+              <mat-icon matPrefix>filter_list</mat-icon>
+              <mat-select [value]="statusFilter()" (selectionChange)="onStatusFilterChange($event.value)">
+                <mat-option value="">All Statuses</mat-option>
+                @for (status of allStatuses; track status) {
+                  <mat-option [value]="status">
+                    {{ status }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            @if (isReviewer()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Filter by Creator</mat-label>
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-select [value]="creatorFilter()" (selectionChange)="onCreatorFilterChange($event.value)">
+                  <mat-option value="">All Creators</mat-option>
+                  @for (creator of uniqueCreators(); track creator) {
+                    <mat-option [value]="creator">
+                      {{ creator }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+
+            <div class="action-button">
+              @if (!isReviewer()) {
+                <button mat-raised-button color="accent" (click)="addDocument()">
+                  <mat-icon>add</mat-icon> Add Document
+                </button>
+              }
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="table-container">
+      <mat-card>
+        <mat-card-content>
+          @if (isLoading()) {
+            <div>
+              <mat-spinner diameter="40" class="loading-spinner"></mat-spinner>
+            </div>
+          }
+
+          @if (!isLoading() && paginatedDocuments().length === 0) {
+            <div class="no-data">
+              No documents found matching your criteria.
+            </div>
+          }
+
+          @if (!isLoading() && paginatedDocuments().length > 0) {
+            <table mat-table [dataSource]="paginatedDocuments()" matSort 
+                (matSortChange)="handleSort($event)">
+              
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>File</th>
+                <td mat-cell *matCellDef="let document">
+                  <div class="file-name-container">
+                    <mat-icon class="file-icon">insert_drive_file</mat-icon>
+                    {{ document.name }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let document">
+                  <span class="status-chip" 
+                    [ngClass]="{
+                      'draft': document.status === 'Draft',
+                      'pending': document.status === 'Pending Review',
+                      'review': document.status === 'In Review',
+                      'approved': document.status === 'Approved',
+                      'rejected': document.status === 'Rejected',
+                      'recalled': document.status === 'Recalled'
+                    }">
+                    {{ document.status }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Created By Column (only for Reviewer) -->
+              <ng-container matColumnDef="createdBy">
+                <th mat-header-cell *matHeaderCellDef>Creator</th>
+                <td mat-cell *matCellDef="let document">
+                  <div class="creator-container">
+                    <mat-icon class="creator-icon">person</mat-icon>
+                    {{ document.createdBy }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Updated At Column -->
+              <ng-container matColumnDef="updatedAt">
+                <th mat-header-cell *matHeaderCellDef>Updated At</th>
+                <td mat-cell *matCellDef="let document">
+                  <div class="date-container">
+                    <mat-icon class="date-icon">update</mat-icon>
+                    {{ document.updatedAt | date:'medium' }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let document">
+                  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Actions" color="primary">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="viewDocument(document)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View</span>
+                    </button>
+
+                    <!-- User-specific actions -->
+                    @if (!isReviewer()) {
+                      @if (canEdit(document)) {
+                        <button mat-menu-item (click)="editDocument(document)">
+                          <mat-icon>edit</mat-icon>
+                          <span>Edit</span>
+                        </button>
+                      }
+                      @if (canRecall(document)) {
+                        <button mat-menu-item (click)="recallDocument(document)">
+                          <mat-icon>replay</mat-icon>
+                          <span>Recall</span>
+                        </button>
+                      }
+                      @if (canDelete(document)) {
+                        <button mat-menu-item (click)="deleteDocument(document)">
+                          <mat-icon color="warn">delete</mat-icon>
+                          <span>Delete</span>
+                        </button>
+                      }
+                    }
+
+                    <!-- Reviewer-specific actions -->
+                    @if (isReviewer()) {
+                      <button mat-menu-item [matMenuTriggerFor]="statusMenu">
+                        <mat-icon>update</mat-icon>
+                        <span>Update Status</span>
+                      </button>
+                    }
+                  </mat-menu>
+
+                  <!-- Status submenu for Reviewer -->
+                  <mat-menu #statusMenu="matMenu">
+                    @if (document.status === 'Pending Review') {
+                      <button mat-menu-item (click)="updateStatus(document, DocumentStatus.InReview)">
+                        <mat-icon color="primary">pending_actions</mat-icon>
+                        <span>Under Review</span>
+                      </button>
+                    }
+                    @if (document.status === 'In Review') {
+                      <button mat-menu-item (click)="updateStatus(document, DocumentStatus.Approved)">
+                        <mat-icon color="primary">check_circle</mat-icon>
+                        <span>Approve</span>
+                      </button>
+                      <button mat-menu-item (click)="updateStatus(document, DocumentStatus.Rejected)">
+                        <mat-icon color="warn">cancel</mat-icon>
+                        <span>Reject</span>
+                      </button>
+                    }
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+              <tr mat-row *matRowDef="let document; columns: displayedColumns()"></tr>
+            </table>
+          }
+
+          @if (!isLoading() && totalDocumentsCount() > 0) {
+            <mat-paginator
+                [length]="totalDocumentsCount()"
+                [pageSize]="pageSize()"
+                [pageSizeOptions]="[5, 10, 25]"
+                (page)="handlePageEvent($event)">
+            </mat-paginator>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div> 
