@@ -192,10 +192,9 @@ export class DashboardComponent implements OnInit {
       ...document,
       fileUrl: this.documentService.getDocumentViewUrl(document)
     };
-    
     this.dialog.open(ViewDocumentDialogComponent, {
       data: { document: viewDocument },
-      width: '800px',
+      minWidth: '1000px',
       height: '600px'
     });
   }
