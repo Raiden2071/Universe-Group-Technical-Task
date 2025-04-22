@@ -1,18 +1,28 @@
 <mat-card>
   <mat-card-content>
-    @if (state.isLoading()) {
+    @if (isProcessingAction()) {
+      <mat-progress-bar mode="indeterminate" class="action-progress"></mat-progress-bar>
+    }
+    
+    @if (actionError()) {
+      <div class="error-message">
+        {{ actionError() }}
+      </div>
+    }
+    
+    @if (isLoading()) {
       <div>
         <mat-spinner diameter="40" class="loading-spinner"></mat-spinner>
       </div>
     }
 
-    @if (!state.isLoading() && state.paginatedDocuments().length === 0) {
+    @if (!isLoading() && !hasDocuments()) {
       <div class="no-data">
         No documents found matching your criteria.
       </div>
     }
 
-    @if (!state.isLoading() && state.paginatedDocuments().length > 0) {
+    @if (!isLoading() && hasDocuments()) {
       <table mat-table [dataSource]="state.paginatedDocuments()" matSort 
           (matSortChange)="handleSort($event)">
         
@@ -75,10 +85,10 @@
       </table>
     }
 
-    @if (!state.isLoading() && state.totalDocumentsCount() > 0) {
+    @if (!isLoading() && totalDocumentsCount() > 0) {
       <mat-paginator
-          [length]="state.totalDocumentsCount()"
-          [pageSize]="state.pageSize()"
+          [length]="totalDocumentsCount()"
+          [pageSize]="pageSize()"
           [pageSizeOptions]="[5, 10, 25]"
           (page)="handlePageEvent($event)">
       </mat-paginator>

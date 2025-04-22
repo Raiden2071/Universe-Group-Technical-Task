@@ -51,4 +51,25 @@
 .recalled {
   background-color: #e1bee7;
   color: #6a1b9a;
+}
+
+.action-progress {
+  margin-bottom: 16px;
+}
+
+.error-message {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  
+  &::before {
+    content: "⚠️";
+    margin-right: 8px;
+    font-size: 16px;
+  }
 } 

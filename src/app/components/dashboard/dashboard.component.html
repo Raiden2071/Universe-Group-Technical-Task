@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+<div class="dashboard-container" [class.is-loading]="isLoading()" [class.is-processing]="isProcessing()">
   <app-dashboard-header></app-dashboard-header>
   <div class="content-container">
     <div class="filters-container">

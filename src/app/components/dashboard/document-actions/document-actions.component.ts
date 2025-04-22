@@ -1,4 +1,4 @@
-import { Component, Input, inject, computed } from '@angular/core';
+import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,7 +22,15 @@ import { Document, DocumentStatus } from '../../../models/document.model';
   styleUrls: ['./document-actions.component.scss']
 })
 export class DocumentActionsComponent {
-  @Input({ required: true }) document!: Document;
+  @Input({ required: true }) set document(value: Document) {
+    this.documentSignal.set(value);
+  }
+  
+  get document(): Document {
+    return this.documentSignal();
+  }
+  
+  private documentSignal = signal<Document>({} as Document);
   
   DocumentStatus = DocumentStatus;
   
@@ -32,16 +40,22 @@ export class DocumentActionsComponent {
   
   isReviewer = computed(() => this.authService.isReviewer());
   
+  canDelete = computed(() => this.documentActions.canDelete(this.documentSignal()));
+  
+  canRecall = computed(() => this.documentActions.canRecall(this.documentSignal()));
+  
+  canEdit = computed(() => this.documentActions.canEdit(this.documentSignal()));
+  
   viewDocument(): void {
-    this.documentActions.viewDocument(this.document);
+    this.documentActions.viewDocument(this.documentSignal());
   }
   
   editDocument(): void {
-    this.documentActions.editDocument(this.document);
+    this.documentActions.editDocument(this.documentSignal());
   }
   
   updateStatus(newStatus: DocumentStatus): void {
-    this.documentActions.updateStatus(this.document, newStatus).subscribe({
+    this.documentActions.updateStatus(this.documentSignal(), newStatus).subscribe({
       next: () => {
         this.snackBar.open(`Document status updated to ${newStatus}`, 'Close', { duration: 3000 });
       },
@@ -52,22 +66,10 @@ export class DocumentActionsComponent {
   }
   
   recallDocument(): void {
-    this.documentActions.recallDocument(this.document);
+    this.documentActions.recallDocument(this.documentSignal());
   }
   
   deleteDocument(): void {
-    this.documentActions.deleteDocument(this.document);
-  }
-  
-  canDelete(): boolean {
-    return this.documentActions.canDelete(this.document);
-  }
-  
-  canRecall(): boolean {
-    return this.documentActions.canRecall(this.document);
-  }
-  
-  canEdit(): boolean {
-    return this.documentActions.canEdit(this.document);
+    this.documentActions.deleteDocument(this.documentSignal());
   }
 } 

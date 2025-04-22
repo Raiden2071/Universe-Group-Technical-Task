@@ -8,9 +8,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { DashboardStateService } from '../../../services/dashboard-state.service';
+import { DocumentActionsService } from '../../../services/document-actions.service';
 import { DocumentActionsComponent } from '../document-actions/document-actions.component';
 
 @Component({
@@ -26,6 +28,7 @@ import { DocumentActionsComponent } from '../document-actions/document-actions.c
     MatButtonModule,
     MatMenuModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     DocumentActionsComponent
   ],
   templateUrl: './document-table.component.html',
@@ -34,6 +37,15 @@ import { DocumentActionsComponent } from '../document-actions/document-actions.c
 export class DocumentTableComponent {
   private readonly authService = inject(AuthService);
   readonly state = inject(DashboardStateService);
+  readonly actions = inject(DocumentActionsService);
+  
+  // Состояние таблицы через сигналы
+  isLoading = computed(() => this.state.isLoading());
+  isProcessingAction = computed(() => this.actions.isProcessing());
+  actionError = computed(() => this.actions.actionError());
+  hasDocuments = computed(() => this.state.paginatedDocuments().length > 0);
+  totalDocumentsCount = computed(() => this.state.totalDocumentsCount());
+  pageSize = computed(() => this.state.pageSize());
   
   displayedColumns = computed(() => 
     this.authService.isReviewer() 

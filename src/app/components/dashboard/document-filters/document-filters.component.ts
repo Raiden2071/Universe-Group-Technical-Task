@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,7 +32,20 @@ export class DocumentFiltersComponent {
   private readonly documentActions = inject(DocumentActionsService);
   readonly state = inject(DashboardStateService);
   
+  // Вычисляемые сигналы
   isReviewer = computed(() => this.authService.isReviewer());
+  statusFilter = computed(() => this.state.statusFilter());
+  creatorFilter = computed(() => this.state.creatorFilter());
+  uniqueCreators = computed(() => this.state.uniqueCreators());
+  isProcessing = computed(() => this.documentActions.isProcessing());
+  
+  constructor() {
+    effect(() => {
+      if (!this.state.isLoading()) {
+        this.state.updateUniqueCreators();
+      }
+    });
+  }
   
   onStatusFilterChange(status: DocumentStatus | ''): void {
     this.state.setStatusFilter(status);

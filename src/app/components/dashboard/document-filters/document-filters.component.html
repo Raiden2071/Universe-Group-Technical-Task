@@ -4,7 +4,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Filter by Status</mat-label>
         <mat-icon matPrefix>filter_list</mat-icon>
-        <mat-select [value]="state.statusFilter()" (selectionChange)="onStatusFilterChange($event.value)">
+        <mat-select [value]="statusFilter()" (selectionChange)="onStatusFilterChange($event.value)">
           <mat-option value="">All Statuses</mat-option>
           @for (status of allStatuses; track status) {
             <mat-option [value]="status">
@@ -18,9 +18,9 @@
         <mat-form-field appearance="outline">
           <mat-label>Filter by Creator</mat-label>
           <mat-icon matPrefix>person</mat-icon>
-          <mat-select [value]="state.creatorFilter()" (selectionChange)="onCreatorFilterChange($event.value)">
+          <mat-select [value]="creatorFilter()" (selectionChange)="onCreatorFilterChange($event.value)">
             <mat-option value="">All Creators</mat-option>
-            @for (creator of state.uniqueCreators(); track creator) {
+            @for (creator of uniqueCreators(); track creator) {
               <mat-option [value]="creator">
                 {{ creator }}
               </mat-option>
@@ -31,7 +31,9 @@
 
       <div class="action-button">
         @if (!isReviewer()) {
-          <button mat-raised-button color="accent" (click)="addDocument()">
+          <button mat-raised-button color="accent" 
+                  [disabled]="isProcessing()"
+                  (click)="addDocument()">
             <mat-icon>add</mat-icon> Add Document
           </button>
         }

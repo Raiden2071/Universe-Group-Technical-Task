@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { DocumentService } from './document.service';
 import { AuthService } from './auth.service';
@@ -19,21 +19,37 @@ export class DocumentActionsService {
   private readonly documentService = inject(DocumentService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  
+  private processingAction = signal<boolean>(false);
+  private lastActionError = signal<string | null>(null);
+  
+  isProcessing = this.processingAction.asReadonly();
+  actionError = this.lastActionError.asReadonly();
 
   addDocument(): void {
     const dialogRef = this.dialog.open(AddDocumentDialogComponent);
     
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.processingAction.set(true);
+        this.lastActionError.set(null);
+        
         this.documentService.addDocument(
           result.name,
           result.file,
           result.saveAsDraft ? DocumentStatus.Draft : DocumentStatus.PendingReview
+        ).pipe(
+          tap({
+            finalize: () => {
+              this.processingAction.set(false);
+            }
+          })
         ).subscribe({
           next: () => {
             this.snackBar.open('Document added successfully', 'Close', { duration: 3000 });
           },
           error: (err) => {
+            this.lastActionError.set(err.message);
             this.snackBar.open(`Error adding document: ${err.message}`, 'Close', { duration: 5000 });
           }
         });
@@ -48,11 +64,21 @@ export class DocumentActionsService {
     
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.documentService.updateDocument(document.id, { name: result.name }).subscribe({
+        this.processingAction.set(true);
+        this.lastActionError.set(null);
+        
+        this.documentService.updateDocument(document.id, { name: result.name }).pipe(
+          tap({
+            finalize: () => {
+              this.processingAction.set(false);
+            }
+          })
+        ).subscribe({
           next: () => {
             this.snackBar.open('Document updated successfully', 'Close', { duration: 3000 });
           },
           error: (err) => {
+            this.lastActionError.set(err.message);
             this.snackBar.open(`Error updating document: ${err.message}`, 'Close', { duration: 5000 });
           }
         });
@@ -73,7 +99,16 @@ export class DocumentActionsService {
   }
   
   updateStatus(document: Document, newStatus: DocumentStatus): Observable<any> {
-    return this.documentService.updateDocument(document.id, { status: newStatus });
+    this.processingAction.set(true);
+    this.lastActionError.set(null);
+    
+    return this.documentService.updateDocument(document.id, { status: newStatus }).pipe(
+      tap({
+        finalize: () => {
+          this.processingAction.set(false);
+        }
+      })
+    );
   }
   
   recallDocument(document: Document): void {
@@ -86,11 +121,21 @@ export class DocumentActionsService {
     
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.documentService.recallDocument(document.id).subscribe({
+        this.processingAction.set(true);
+        this.lastActionError.set(null);
+        
+        this.documentService.recallDocument(document.id).pipe(
+          tap({
+            finalize: () => {
+              this.processingAction.set(false);
+            }
+          })
+        ).subscribe({
           next: () => {
             this.snackBar.open('Document recalled successfully', 'Close', { duration: 3000 });
           },
           error: (err) => {
+            this.lastActionError.set(err.message);
             this.snackBar.open(`Error recalling document: ${err.message}`, 'Close', { duration: 5000 });
           }
         });
@@ -108,11 +153,21 @@ export class DocumentActionsService {
     
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.documentService.deleteDocument(document.id).subscribe({
+        this.processingAction.set(true);
+        this.lastActionError.set(null);
+        
+        this.documentService.deleteDocument(document.id).pipe(
+          tap({
+            finalize: () => {
+              this.processingAction.set(false);
+            }
+          })
+        ).subscribe({
           next: () => {
             this.snackBar.open('Document deleted successfully', 'Close', { duration: 3000 });
           },
           error: (err) => {
+            this.lastActionError.set(err.message);
             this.snackBar.open(`Error deleting document: ${err.message}`, 'Close', { duration: 5000 });
           }
         });
