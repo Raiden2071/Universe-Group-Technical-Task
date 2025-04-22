@@ -1,0 +1,15 @@
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.action-button {
+  margin-left: auto;
+} 

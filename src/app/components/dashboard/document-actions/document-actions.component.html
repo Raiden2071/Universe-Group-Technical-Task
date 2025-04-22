@@ -1,0 +1,56 @@
+<button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Actions" color="primary">
+  <mat-icon>more_vert</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="viewDocument()">
+    <mat-icon>visibility</mat-icon>
+    <span>View</span>
+  </button>
+
+  @if (!isReviewer()) {
+    @if (canEdit()) {
+      <button mat-menu-item (click)="editDocument()">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+    }
+    @if (canRecall()) {
+      <button mat-menu-item (click)="recallDocument()">
+        <mat-icon>replay</mat-icon>
+        <span>Recall</span>
+      </button>
+    }
+    @if (canDelete()) {
+      <button mat-menu-item (click)="deleteDocument()">
+        <mat-icon color="warn">delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    }
+  }
+
+  @if (isReviewer()) {
+    <button mat-menu-item [matMenuTriggerFor]="statusMenu">
+      <mat-icon>update</mat-icon>
+      <span>Update Status</span>
+    </button>
+  }
+</mat-menu>
+
+<mat-menu #statusMenu="matMenu">
+  @if (document.status === 'Pending Review') {
+    <button mat-menu-item (click)="updateStatus(DocumentStatus.InReview)">
+      <mat-icon color="primary">pending_actions</mat-icon>
+      <span>Under Review</span>
+    </button>
+  }
+  @if (document.status === 'In Review') {
+    <button mat-menu-item (click)="updateStatus(DocumentStatus.Approved)">
+      <mat-icon color="primary">check_circle</mat-icon>
+      <span>Approve</span>
+    </button>
+    <button mat-menu-item (click)="updateStatus(DocumentStatus.Rejected)">
+      <mat-icon color="warn">cancel</mat-icon>
+      <span>Reject</span>
+    </button>
+  }
+</mat-menu> 

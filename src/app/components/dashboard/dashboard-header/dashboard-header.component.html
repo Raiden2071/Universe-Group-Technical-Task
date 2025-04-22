@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+  <div class="title-with-icon">
+    <mat-icon>description</mat-icon>
+    <span>Document Management System</span>
+  </div>
+  <span class="toolbar-spacer"></span>
+  @if (currentUser(); as user) {
+    <span class="user-info">
+      <mat-icon>person</mat-icon>
+      {{ user.username }} ({{ user.role }})
+    </span>
+  }
+  <button mat-icon-button (click)="logout()" title="Logout">
+    <mat-icon>exit_to_app</mat-icon>
+  </button>
+</mat-toolbar> 

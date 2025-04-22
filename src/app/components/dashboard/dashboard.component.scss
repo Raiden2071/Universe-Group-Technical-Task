@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f8f9fa;
+  overflow: hidden;
 }
 
 mat-toolbar {
@@ -43,10 +43,17 @@ mat-toolbar {
 }
 
 .content-container {
-  padding: 20px;
-  overflow-y: auto;
   flex: 1;
-  animation: fade-in 0.4s ease-out;
+  padding: 16px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filters-container, 
+.table-container {
+  width: 100%;
 }
 
 .filters-container {
@@ -85,10 +92,6 @@ mat-form-field {
       margin-right: 4px;
     }
   }
-}
-
-.table-container {
-  overflow-x: auto;
 }
 
 mat-card {
